@@ -1,4 +1,4 @@
-# awscdk-examples
+# awscdk-examples-tgwarch
 
 To launch the code, you need to launch following comands.
 
