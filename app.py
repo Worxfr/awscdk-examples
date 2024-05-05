@@ -16,29 +16,41 @@ class Tgwarch(cdk.Stack):
                       ip_addresses=ec2.IpAddresses.cidr("10.10.0.0/16"),
                       subnet_configuration=[ec2.SubnetConfiguration(
                           subnet_type=ec2.SubnetType.PRIVATE_ISOLATED,
-                          name="MyPriv",
+                          name="vpc1sub1Routable",
                           cidr_mask=24
                       )]
         )
 
         vpc1cidr2 = ec2.CfnVPCCidrBlock(self, "VPC1CIDR2",
             vpc_id=vpc.vpc_id,
-            cidr_block="100.64.0.0/24"
+            cidr_block="100.64.0.0/16"
         )
+
+        private_subnet = ec2.PrivateSubnet(self, "vpc1sub2NonRoutable",
+            availability_zone=vpc.availability_zones[0],
+            cidr_block="100.64.0.0/24",
+            vpc_id=vpc.vpc_id)
+        
 
         vpc2 = ec2.Vpc(self, "MyVpc2",
                 max_azs=1,
                 ip_addresses=ec2.IpAddresses.cidr("10.20.0.0/16"),
                 subnet_configuration=[ec2.SubnetConfiguration(
                     subnet_type=ec2.SubnetType.PRIVATE_ISOLATED,
-                    name="MyPriv",
+                    name="vpc2sub1Routable",
                     cidr_mask=24
                 )]
         )
         vpc2cidr2 = ec2.CfnVPCCidrBlock(self, "VPC2CIDR2",
             vpc_id=vpc2.vpc_id,
-            cidr_block="100.64.0.0/24"
+            cidr_block="100.64.0.0/16"
         )
+
+        private_subnet2 = ec2.PrivateSubnet(self, "vpc2sub2NonRoutable",
+            availability_zone=vpc2.availability_zones[0],
+            cidr_block="100.64.0.0/24",
+            vpc_id=vpc2.vpc_id)
+
 
 app = cdk.App()
 
