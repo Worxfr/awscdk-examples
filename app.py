@@ -26,10 +26,14 @@ class Tgwarch(cdk.Stack):
             cidr_block="100.64.0.0/16"
         )
 
-        private_subnet = ec2.PrivateSubnet(self, "vpc1sub2NonRoutable",
+        private_subnet = ec2.CfnSubnet(self, "vpc1sub2NonRoutable",
             availability_zone=vpc.availability_zones[0],
             cidr_block="100.64.0.0/24",
-            vpc_id=vpc.vpc_id)
+            vpc_id=vpc.vpc_id,
+            tags= [cdk.CfnTag(key="Name", value="Tgwarch/MyVpc/vpc1sub2NonRoutable")]) 
+
+
+        private_subnet.add_dependency(vpc1cidr2)
         
 
         vpc2 = ec2.Vpc(self, "MyVpc2",
@@ -46,10 +50,14 @@ class Tgwarch(cdk.Stack):
             cidr_block="100.64.0.0/16"
         )
 
-        private_subnet2 = ec2.PrivateSubnet(self, "vpc2sub2NonRoutable",
+        private_subnet2 = ec2.CfnSubnet(self, 
+            "vpc2sub2NonRoutable",
             availability_zone=vpc2.availability_zones[0],
             cidr_block="100.64.0.0/24",
-            vpc_id=vpc2.vpc_id)
+            vpc_id=vpc2.vpc_id,
+            tags= [cdk.CfnTag(key="Name", value="Tgwarch/MyVpc2/vpc2sub2NonRoutable")])
+        
+        private_subnet2.add_dependency(vpc2cidr2)
 
 
 app = cdk.App()
