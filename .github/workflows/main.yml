@@ -14,6 +14,7 @@ permissions:
 jobs:
   S3PackageUpload:
     runs-on: ubuntu-latest
+    environment: test
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
