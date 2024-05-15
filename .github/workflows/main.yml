@@ -3,9 +3,9 @@
 name: AWS example workflow
 on:
   push
-
-# env:
-  #AWS_REGION : "<example-aws-region>"
+env:
+  # Setting an environment variable with the value of a configuration variable
+  env_var: ${{ vars.ENV_CONTEXT_VAR }}
 
 # permission can be added at job level or workflow level
 permissions:
