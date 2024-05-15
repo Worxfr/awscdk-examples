@@ -28,3 +28,10 @@ jobs:
       - name:  Copy index.html to s3
         run: |
           aws sts get-caller-identity
+      - name: cdk deploy
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          cdk_stack: 'Tgwarch'
+          cdk_args: '--require-approval never'
+          actions_comment: false
