@@ -25,9 +25,15 @@ jobs:
           role-session-name: samplerolesession
           aws-region: ${{ vars.AWS_REGION }}
       # Get STS Id test
-      - name:  Copy index.html to s3
+      - name:  Get STS Id test
         run: |
           aws sts get-caller-identity
+      - name: cdk bootstrap
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'bootstrap'
+          cdk_args: '--require-approval never'
+          actions_comment: false
       - name: cdk deploy
         uses: youyo/aws-cdk-github-actions@v2
         with:
