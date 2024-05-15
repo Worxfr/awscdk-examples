@@ -21,7 +21,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ vars.AWS_ROLE }}
+          role-to-assume: 'arn:aws:iam::${{ vars.AWS_ACCOUNTID }}:role/${{ vars.AWS_ROLE }}'
           role-session-name: samplerolesession
           aws-region: ${{ vars.AWS_REGION }}
       # Get STS Id test
@@ -32,7 +32,7 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'bootstrap'
-          cdk_args: '--require-approval never'
+          cdk_args: 'aws://${{ vars.AWS_ACCOUNTID }}/${{ vars.AWS_REGION }}'
           actions_comment: false
       - name: cdk deploy
         uses: youyo/aws-cdk-github-actions@v2
