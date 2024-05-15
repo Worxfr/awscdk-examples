@@ -20,10 +20,10 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{ env.AWS_ROLE }}
+          role-to-assume: ${{ vars.AWS_ROLE }}
           role-session-name: samplerolesession
-          aws-region: ${{ env.AWS_REGION }}
-      # Upload a file to AWS s3
+          aws-region: ${{ vars.AWS_REGION }}
+      # Get STS Id test
       - name:  Copy index.html to s3
         run: |
           aws sts get-caller-identity
