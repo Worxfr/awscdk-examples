@@ -3,12 +3,12 @@ import os
 
 import aws_cdk as cdk
 import aws_cdk.aws_ec2 as ec2
-import awscdk_examples_tgwarch_stack.awscdk_examples_tgwarch_stack
+from awscdk_examples_tgwarch.awscdk_examples_tgwarch_stack import CdkTGW
 from constructs import Construct
 
 
 app = cdk.App()
 
-awscdk_examples_tgwarch_stack(app, "awscdk_examples_tgwarch_stack",)
+CdkTGW(app, "tgwarchstack",)
 
 app.synth()
