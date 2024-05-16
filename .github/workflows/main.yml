@@ -13,8 +13,11 @@ permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
 jobs:
-  StsTest:
+  TGWArchTest:
     runs-on: ubuntu-latest
+    concurrency:
+      group: example-group
+      cancel-in-progress: true
     environment: test
     steps:
       - name: Git clone the repository
