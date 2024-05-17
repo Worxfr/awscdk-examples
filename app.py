@@ -3,7 +3,7 @@ import os
 
 import aws_cdk as cdk
 import aws_cdk.aws_ec2 as ec2
-from awscdk_examples_tgwarch.awscdk_examples_tgwarch_stack import CdkTGW
+from awscdk_examples_tgwarch.network import CdkTGW
 from constructs import Construct
 
 
