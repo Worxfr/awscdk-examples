@@ -76,5 +76,28 @@ class CdkTGW(cdk.Stack):
             value="value"
         )],
         #transit_gateway_cidr_blocks=["transitGatewayCidrBlocks"],
-        vpn_ecmp_support="enable"
-)
+        vpn_ecmp_support="enable")
+
+        cfn_transit_gateway_attachment = ec2.CfnTransitGatewayAttachment(self, "MyCfnTransitGatewayAttachment",
+        subnet_ids=[private_subnet.attr_subnet_id],
+        transit_gateway_id=cfn_transit_gateway.attr_id,
+        vpc_id=vpc.vpc_id,
+        # the properties below are optional
+        #options=options,
+        tags=[cdk.CfnTag(
+            key="key",
+            value="value"
+            )]
+        )
+
+        cfn_transit_gateway_attachment_2 = ec2.CfnTransitGatewayAttachment(self, "MyCfnTransitGatewayAttachment2",
+        subnet_ids=[private_subnet2.attr_subnet_id],
+        transit_gateway_id=cfn_transit_gateway.attr_id,
+        vpc_id=vpc2.vpc_id,
+        # the properties below are optional
+        #options=options,
+        tags=[cdk.CfnTag(
+            key="key",
+            value="value"
+            )]
+        )
