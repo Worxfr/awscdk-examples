@@ -44,9 +44,9 @@ jobs:
           cdk_subcommand: 'deploy'
           cdk_args: '--require-approval never'
           actions_comment: false
-      - name: cdk destroy
-        uses: youyo/aws-cdk-github-actions@v2
-        with:
-          cdk_subcommand: 'destroy'
-          cdk_args: '--force'
-          actions_comment: false
+      #- name: cdk destroy
+      #  uses: youyo/aws-cdk-github-actions@v2
+      #  with:
+      #    cdk_subcommand: 'destroy'
+      #    cdk_args: '--force'
+      #    actions_comment: false

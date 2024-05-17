@@ -60,3 +60,21 @@ class CdkTGW(cdk.Stack):
             tags= [cdk.CfnTag(key="Name", value="Tgwarch/MyVpc2/vpc2sub2NonRoutable")])
         
         private_subnet2.add_dependency(vpc2cidr2)
+
+        cfn_transit_gateway = ec2.CfnTransitGateway(self, "MyCfnTransitGateway",
+        amazon_side_asn=64512,
+        association_default_route_table_id="associationDefaultRouteTableId",
+        auto_accept_shared_attachments="enable",
+        default_route_table_association="enable",
+        default_route_table_propagation="enable",
+        description="description",
+        dns_support="enable",
+        multicast_support="enable",
+        #propagation_default_route_table_id="propagationDefaultRouteTableId",
+        tags=[cdk.CfnTag(
+            key="key",
+            value="value"
+        )],
+        #transit_gateway_cidr_blocks=["transitGatewayCidrBlocks"],
+        vpn_ecmp_support="enable"
+)
