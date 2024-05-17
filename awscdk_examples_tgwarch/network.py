@@ -72,8 +72,8 @@ class CdkTGW(cdk.Stack):
         multicast_support="enable",
         #propagation_default_route_table_id="propagationDefaultRouteTableId",
         tags=[cdk.CfnTag(
-            key="key",
-            value="value"
+            key="Name",
+            value="TGWArch-TGW"
         )],
         #transit_gateway_cidr_blocks=["transitGatewayCidrBlocks"],
         vpn_ecmp_support="enable")
@@ -85,8 +85,8 @@ class CdkTGW(cdk.Stack):
         # the properties below are optional
         #options=options,
         tags=[cdk.CfnTag(
-            key="key",
-            value="value"
+            key="Name",
+            value="TGWArch-TGWAttach1"
             )]
         )
 
@@ -97,7 +97,7 @@ class CdkTGW(cdk.Stack):
         # the properties below are optional
         #options=options,
         tags=[cdk.CfnTag(
-            key="key",
-            value="value"
+            key="Name",
+            value="TGWArch-TGWAttach2"
             )]
         )
