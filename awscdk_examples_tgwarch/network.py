@@ -63,10 +63,9 @@ class CdkTGW(cdk.Stack):
 
         cfn_transit_gateway = ec2.CfnTransitGateway(self, "MyCfnTransitGateway",
         amazon_side_asn=64512,
-        association_default_route_table_id="associationDefaultRouteTableId",
         auto_accept_shared_attachments="enable",
-        default_route_table_association="enable",
-        default_route_table_propagation="enable",
+        default_route_table_association="disable",
+        default_route_table_propagation="disable",
         description="description",
         dns_support="enable",
         multicast_support="enable",
@@ -102,10 +101,19 @@ class CdkTGW(cdk.Stack):
             )]
         )
 
-        
+        cfn_transit_gateway_route_table = ec2.CfnTransitGatewayRouteTable(self, "MyCfnTransitGatewayRouteTable",
+            transit_gateway_id=cfn_transit_gateway.attr_id,
+
+            # the properties below are optional
+            tags=[cdk.CfnTag(
+                key="Name",
+                value="tgwRT"
+            )]
+        )
+
         cfn_transit_gateway_route = ec2.CfnTransitGatewayRoute(self, "MyCfnTransitGatewayRoute",
         destination_cidr_block="10.20.0.0/16",
-        transit_gateway_route_table_id=cfn_transit_gateway.association_default_route_table_id,
+        transit_gateway_route_table_id=cfn_transit_gateway_route_table.attr_transit_gateway_route_table_id,
         # the properties below are optional
         blackhole=False,
         transit_gateway_attachment_id=cfn_transit_gateway_attachment.attr_id 
@@ -113,7 +121,7 @@ class CdkTGW(cdk.Stack):
 
         cfn_transit_gateway_route_2 = ec2.CfnTransitGatewayRoute(self, "MyCfnTransitGatewayRoute2",
         destination_cidr_block="10.10.0.0/16",
-        transit_gateway_route_table_id=cfn_transit_gateway.association_default_route_table_id,
+        transit_gateway_route_table_id=cfn_transit_gateway_route_table.attr_transit_gateway_route_table_id,
         # the properties below are optional
         blackhole=False,
         transit_gateway_attachment_id=cfn_transit_gateway_attachment_2.attr_id 
