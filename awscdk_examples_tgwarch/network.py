@@ -101,3 +101,20 @@ class CdkTGW(cdk.Stack):
             value="TGWArch-TGWAttach2"
             )]
         )
+
+        
+        cfn_transit_gateway_route = ec2.CfnTransitGatewayRoute(self, "MyCfnTransitGatewayRoute",
+        destination_cidr_block="10.20.0.0/16",
+        transit_gateway_route_table_id=cfn_transit_gateway.association_default_route_table_id,
+        # the properties below are optional
+        blackhole=False,
+        transit_gateway_attachment_id=cfn_transit_gateway_attachment.attr_id 
+        )
+
+        cfn_transit_gateway_route_2 = ec2.CfnTransitGatewayRoute(self, "MyCfnTransitGatewayRoute2",
+        destination_cidr_block="10.10.0.0/16",
+        transit_gateway_route_table_id=cfn_transit_gateway.association_default_route_table_id,
+        # the properties below are optional
+        blackhole=False,
+        transit_gateway_attachment_id=cfn_transit_gateway_attachment_2.attr_id 
+        )
