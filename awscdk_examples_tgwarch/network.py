@@ -1,3 +1,4 @@
+from typing import Sequence
 from aws_cdk import (
     # Duration,
     Stack,
@@ -125,6 +126,15 @@ class CdkTGW(cdk.Stack):
         # the properties below are optional
         blackhole=False,
         transit_gateway_attachment_id=cfn_transit_gateway_attachment_2.attr_id 
+        )
+
+        vpc1select=vpc.select_subnets(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])])
+
+        for subn in vpc1select.subnets :
+            ec2.CfnRoute(self, 'tgwRoute',
+            destination_cidr_block='10.20.0.0/16',
+            route_table_id=subn.route_table.route_table_id,
+            transit_gateway_id=cfn_transit_gateway.attr_id
         )
 
         # add private endpoints for session manager
