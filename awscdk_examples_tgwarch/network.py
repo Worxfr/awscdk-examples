@@ -138,7 +138,7 @@ class CdkTGW(cdk.Stack):
 
         vpc2select=vpc2.select_subnets(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.20.0.0/16"])])
         for subn in vpc2select.subnets :
-            ec2.CfnRoute(self, 'tgwRoute',
+            ec2.CfnRoute(self, 'tgwRoute2',
             destination_cidr_block='10.10.0.0/16',
             route_table_id=subn.route_table.route_table_id,
             transit_gateway_id=cfn_transit_gateway.attr_id
