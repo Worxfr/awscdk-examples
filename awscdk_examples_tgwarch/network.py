@@ -136,7 +136,7 @@ class CdkTGW(cdk.Stack):
             route_table_id=subn.route_table.route_table_id,
             transit_gateway_id=cfn_transit_gateway.attr_id
             )
-            NewRoute.add_dependency(cfn_transit_gateway)
+            NewRoute.add_dependency(cfn_transit_gateway_attachment)
 
 
         # add private endpoints for session manager
