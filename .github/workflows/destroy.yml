@@ -12,8 +12,11 @@ permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
 jobs:
-  DeleteCDKStack:
+  TGWArchDestroy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: example-group
+      cancel-in-progress: true
     environment: test
     steps:
       - name: Git clone the repository
@@ -32,6 +35,7 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: 'destroy'
-          cdk_stack: 'Tgwarch'
           cdk_args: '--force'
           actions_comment: false
+        env: 
+          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}

@@ -12,8 +12,11 @@ permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
 jobs:
-  StsTest:
+  TGWArchDeploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: example-group
+      cancel-in-progress: true
     environment: test
     steps:
       - name: Git clone the repository
@@ -34,3 +37,14 @@ jobs:
           cdk_subcommand: 'bootstrap'
           cdk_stack: 'aws://${{ vars.AWS_ACCOUNTID }}/${{ vars.AWS_REGION }}'
           actions_comment: false
+        env: 
+          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+      - name: cdk deploy
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy'
+          cdk_args: '--require-approval never'
+          actions_comment: false
+        env: 
+          AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
+
