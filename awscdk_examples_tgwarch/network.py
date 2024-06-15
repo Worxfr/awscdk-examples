@@ -126,3 +126,32 @@ class CdkTGW(cdk.Stack):
         blackhole=False,
         transit_gateway_attachment_id=cfn_transit_gateway_attachment_2.attr_id 
         )
+
+        # add private endpoints for session manager
+        vpc.add_interface_endpoint('SsmEndpoint', 
+            service=ec2.InterfaceVpcEndpointAwsService.SSM,
+            subnets=private_subnet
+        );
+        vpc.add_interface_endpoint('SsmMessagesEndpoint', 
+            service=ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
+            subnets=private_subnet
+        );
+        vpc.add_interface_endpoint('Ec2MessagesEndpoint', 
+            service=ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
+            subnets=private_subnet
+        );
+
+        
+        # add private endpoints for session manager
+        vpc2.add_interface_endpoint('SsmEndpoint', 
+            service=ec2.InterfaceVpcEndpointAwsService.SSM,
+            subnets=private_subnet2
+        );
+        vpc2.add_interface_endpoint('SsmMessagesEndpoint', 
+            service=ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
+            subnets=private_subnet2
+        );
+        vpc2.add_interface_endpoint('Ec2MessagesEndpoint', 
+            service=ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
+            subnets=private_subnet2
+        );
