@@ -130,14 +130,13 @@ class CdkTGW(cdk.Stack):
 
         vpc1select=vpc.select_subnets(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])])
 
-        
-
         for subn in vpc1select.subnets :
-            ec2.CfnRoute(self, 'tgwRoute',
+            NewRoute=ec2.CfnRoute(self, 'tgwRoute',
             destination_cidr_block='10.20.0.0/16',
             route_table_id=subn.route_table.route_table_id,
             transit_gateway_id=cfn_transit_gateway.attr_id
-            ).add_dependency(cfn_transit_gateway)
+            )
+            NewRoute.add_dependency(cfn_transit_gateway)
 
 
         # add private endpoints for session manager
