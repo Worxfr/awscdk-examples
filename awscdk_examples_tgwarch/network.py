@@ -149,19 +149,25 @@ class CdkTGW(cdk.Stack):
             service=ec2.InterfaceVpcEndpointAwsService.SSM,
             subnets={
                 "subnets": [private_subnet]
-            }
+            },
+            open=True,
+            private_dns_enabled=True
         )
         vpc.add_interface_endpoint('SsmMessagesEndpoint', 
             service=ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
             subnets={
                 "subnets": [private_subnet]
-            }
+            },
+            open=True,
+            private_dns_enabled=True
         )
         vpc.add_interface_endpoint('Ec2MessagesEndpoint', 
             service=ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
             subnets={
                 "subnets": [private_subnet]
-            }
+            },
+            open=True,
+            private_dns_enabled=True
         )
 
         # add private endpoints for session manager
@@ -169,19 +175,25 @@ class CdkTGW(cdk.Stack):
             service=ec2.InterfaceVpcEndpointAwsService.SSM,
             subnets={
                 "subnets": [private_subnet2]
-            }
+            },
+            open=True,
+            private_dns_enabled=True
         )
         vpc2.add_interface_endpoint('SsmMessagesEndpoint', 
             service=ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
             subnets={
                 "subnets": [private_subnet2]
-            }
+            },
+            open=True,
+            private_dns_enabled=True
         )
         vpc2.add_interface_endpoint('Ec2MessagesEndpoint', 
             service=ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
             subnets={
                 "subnets": [private_subnet2]
-            }
+            },
+            open=True,
+            private_dns_enabled=True
         )
 
         
