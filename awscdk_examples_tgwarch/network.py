@@ -196,4 +196,20 @@ class CdkTGW(cdk.Stack):
             private_dns_enabled=True
         )
 
+        # Create an EC2 instance
+        instance = ec2.Instance(self, "EC2Instance VPC1",
+            instance_type=ec2.InstanceType("t3.micro"),
+            machine_image=ec2.MachineImage.latest_amazon_linux2(),
+            vpc=vpc,
+            vpc_subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])])
+        )
+
+        # Create an EC2 instance
+        instance2 = ec2.Instance(self, "EC2Instance VPC2",
+            instance_type=ec2.InstanceType("t3.micro"),
+            machine_image=ec2.MachineImage.latest_amazon_linux2(),
+            vpc=vpc2,
+            vpc_subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.20.0.0/16"])])
+        )
+
         
