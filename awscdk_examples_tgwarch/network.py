@@ -3,6 +3,7 @@ from aws_cdk import (
     # Duration,
     Stack,
     # aws_sqs as sqs,
+    Aws
 )
 import aws_cdk as cdk
 import aws_cdk.aws_ec2 as ec2
@@ -144,59 +145,110 @@ class CdkTGW(cdk.Stack):
             transit_gateway_id=cfn_transit_gateway.attr_id
             ).add_dependency(cfn_transit_gateway_attachment_2)
 
-        # add private endpoints for session manager
-        vpc.add_interface_endpoint('SsmEndpoint', 
-            service=ec2.InterfaceVpcEndpointAwsService.SSM,
-            subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])]),
-            open=True,
-            private_dns_enabled=True
-        )
-        vpc.add_interface_endpoint('SsmMessagesEndpoint', 
-            service=ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
-            subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])]),
-            open=True,
-            private_dns_enabled=True
-        )
-        vpc.add_interface_endpoint('Ec2MessagesEndpoint', 
-            service=ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
-            subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])]),
-            open=True,
-            private_dns_enabled=True
+        SGVPCe1 = ec2.SecurityGroup(self, "security-group-VPCe-1",
+            vpc=vpc,
+            allow_all_outbound=True,
+            description='CDK VPC Endp Security Group'
         )
 
+        SGVPCe1.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), 'HTTPS frm anywhere')
+
+
         # add private endpoints for session manager
-        vpc2.add_interface_endpoint('SsmEndpoint', 
-            service=ec2.InterfaceVpcEndpointAwsService.SSM,
-            subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.20.0.0/16"])]),
-            open=True,
+        ec2.CfnVPCEndpoint(self, 'ssm-vpce', 
+            service_name="com.amazonaws."+Aws.REGION+".ssm",
+            vpc_id=vpc.vpc_id,
+            subnet_ids=[private_subnet.attr_subnet_id],
+            security_group_ids=[SGVPCe1.security_group_id],
+            vpc_endpoint_type='Interface',
             private_dns_enabled=True
-        )
-        vpc2.add_interface_endpoint('SsmMessagesEndpoint', 
-            service=ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
-            subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.20.0.0/16"])]),
-            open=True,
+        ).add_dependency(private_subnet)
+
+        ec2.CfnVPCEndpoint(self, 'ssmmessages-vpce', 
+            service_name="com.amazonaws."+Aws.REGION+".ssmmessages",
+            vpc_id=vpc.vpc_id,
+            subnet_ids=[private_subnet.attr_subnet_id],
+            security_group_ids=[SGVPCe1.security_group_id],
+            vpc_endpoint_type='Interface',
             private_dns_enabled=True
-        )
-        vpc2.add_interface_endpoint('Ec2MessagesEndpoint', 
-            service=ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
-            subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.20.0.0/16"])]),
-            open=True,
+        ).add_dependency(private_subnet)
+
+        ec2.CfnVPCEndpoint(self, 'ec2-vpce', 
+            service_name="com.amazonaws."+Aws.REGION+".ec2",
+            vpc_id=vpc.vpc_id,
+            subnet_ids=[private_subnet.attr_subnet_id],
+            security_group_ids=[SGVPCe1.security_group_id],
+            vpc_endpoint_type='Interface',
             private_dns_enabled=True
+        ).add_dependency(private_subnet)
+
+        SGVPCe2 = ec2.SecurityGroup(self, "security-group-VPCe-2",
+            vpc=vpc2,
+            allow_all_outbound=True,
+            description='CDK VPC Endp Security Group'
         )
+
+        SGVPCe2.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), 'HTTPS frm anywhere')
+
+        # add private endpoints for session manager
+        ec2.CfnVPCEndpoint(self, 'ssm-vpce-2', 
+            service_name="com.amazonaws."+Aws.REGION+".ssm",
+            vpc_id=vpc2.vpc_id,
+            subnet_ids=[private_subnet2.attr_subnet_id],
+            security_group_ids=[SGVPCe2.security_group_id],
+            vpc_endpoint_type='Interface',
+            private_dns_enabled=True
+        ).add_dependency(private_subnet2)
+
+        ec2.CfnVPCEndpoint(self, 'ssmmessages-vpce-2', 
+            service_name="com.amazonaws."+Aws.REGION+".ssmmessages",
+            vpc_id=vpc2.vpc_id,
+            subnet_ids=[private_subnet2.attr_subnet_id],
+            security_group_ids=[SGVPCe2.security_group_id],
+            vpc_endpoint_type='Interface',
+            private_dns_enabled=True
+        ).add_dependency(private_subnet2)
+
+        ec2.CfnVPCEndpoint(self, 'ec2-vpce-2', 
+            service_name="com.amazonaws."+Aws.REGION+".ec2",
+            vpc_id=vpc2.vpc_id,
+            subnet_ids=[private_subnet2.attr_subnet_id],
+            security_group_ids=[SGVPCe2.security_group_id],
+            vpc_endpoint_type='Interface',
+            private_dns_enabled=True
+        ).add_dependency(private_subnet2)
+
+        SGVEC21 = ec2.SecurityGroup(self, "security-group-EC2-1",
+            vpc=vpc,
+            allow_all_outbound=True,
+            description='CDK EC2 Security Group'
+        )
+
+        SGVEC21.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.icmp_ping(), 'Ping from anywhere')
 
         # Create an EC2 instance
         instance = ec2.Instance(self, "EC2Instance VPC1",
             instance_type=ec2.InstanceType("t3.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux2(),
             vpc=vpc,
+            security_group=SGVEC21,
             vpc_subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])])
         )
+
+        SGVEC22 = ec2.SecurityGroup(self, "security-group-EC2-2",
+            vpc=vpc2,
+            allow_all_outbound=True,
+            description='CDK EC2 Security Group'
+        )
+
+        SGVEC22.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.icmp_ping(), 'Ping from anywhere')
 
         # Create an EC2 instance
         instance2 = ec2.Instance(self, "EC2Instance VPC2",
             instance_type=ec2.InstanceType("t3.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux2(),
             vpc=vpc2,
+            security_group=SGVEC22,
             vpc_subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.20.0.0/16"])])
         )
 
