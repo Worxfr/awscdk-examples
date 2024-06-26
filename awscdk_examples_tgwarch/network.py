@@ -105,7 +105,6 @@ class CdkTGW(cdk.Stack):
 
         cfn_transit_gateway_route_table = ec2.CfnTransitGatewayRouteTable(self, "MyCfnTransitGatewayRouteTable",
             transit_gateway_id=cfn_transit_gateway.attr_id,
-
             # the properties below are optional
             tags=[cdk.CfnTag(
                 key="Name",
@@ -113,8 +112,18 @@ class CdkTGW(cdk.Stack):
             )]
         )
 
+
+
+        ec2.CfnTransitGatewayRouteTableAssociation(self, "MyCfnTransitGatewayRouteTableAssociation",
+            transit_gateway_attachment_id=cfn_transit_gateway_attachment.attr_id,
+            transit_gateway_route_table_id=cfn_transit_gateway_route_table.attr_transit_gateway_route_table_id)
+
+        ec2.CfnTransitGatewayRouteTableAssociation(self, "MyCfnTransitGatewayRouteTableAssociation2",
+            transit_gateway_attachment_id=cfn_transit_gateway_attachment_2.attr_id,
+            transit_gateway_route_table_id=cfn_transit_gateway_route_table.attr_transit_gateway_route_table_id)
+
         cfn_transit_gateway_route = ec2.CfnTransitGatewayRoute(self, "MyCfnTransitGatewayRoute",
-        destination_cidr_block="10.20.0.0/16",
+        destination_cidr_block="10.10.0.0/16",
         transit_gateway_route_table_id=cfn_transit_gateway_route_table.attr_transit_gateway_route_table_id,
         # the properties below are optional
         blackhole=False,
@@ -122,7 +131,7 @@ class CdkTGW(cdk.Stack):
         )
 
         cfn_transit_gateway_route_2 = ec2.CfnTransitGatewayRoute(self, "MyCfnTransitGatewayRoute2",
-        destination_cidr_block="10.10.0.0/16",
+        destination_cidr_block="10.20.0.0/16",
         transit_gateway_route_table_id=cfn_transit_gateway_route_table.attr_transit_gateway_route_table_id,
         # the properties below are optional
         blackhole=False,
@@ -145,21 +154,22 @@ class CdkTGW(cdk.Stack):
             transit_gateway_id=cfn_transit_gateway.attr_id
             ).add_dependency(cfn_transit_gateway_attachment_2)
 
-        SGVPCe1 = ec2.SecurityGroup(self, "security-group-VPCe-1",
+        # add private endpoints for session manager
+
+        mySG = ec2.SecurityGroup(self, "security-group-VPCes",
             vpc=vpc,
             allow_all_outbound=True,
             description='CDK VPC Endp Security Group'
         )
 
-        SGVPCe1.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), 'HTTPS frm anywhere')
-
+        mySG.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), 'HTTPS frm anywhere')
 
         # add private endpoints for session manager
         ec2.CfnVPCEndpoint(self, 'ssm-vpce', 
             service_name="com.amazonaws."+Aws.REGION+".ssm",
             vpc_id=vpc.vpc_id,
             subnet_ids=[private_subnet.attr_subnet_id],
-            security_group_ids=[SGVPCe1.security_group_id],
+            security_group_ids=[mySG.security_group_id],
             vpc_endpoint_type='Interface',
             private_dns_enabled=True
         ).add_dependency(private_subnet)
@@ -168,7 +178,7 @@ class CdkTGW(cdk.Stack):
             service_name="com.amazonaws."+Aws.REGION+".ssmmessages",
             vpc_id=vpc.vpc_id,
             subnet_ids=[private_subnet.attr_subnet_id],
-            security_group_ids=[SGVPCe1.security_group_id],
+            security_group_ids=[mySG.security_group_id],
             vpc_endpoint_type='Interface',
             private_dns_enabled=True
         ).add_dependency(private_subnet)
@@ -177,78 +187,80 @@ class CdkTGW(cdk.Stack):
             service_name="com.amazonaws."+Aws.REGION+".ec2",
             vpc_id=vpc.vpc_id,
             subnet_ids=[private_subnet.attr_subnet_id],
-            security_group_ids=[SGVPCe1.security_group_id],
+            security_group_ids=[mySG.security_group_id],
             vpc_endpoint_type='Interface',
             private_dns_enabled=True
         ).add_dependency(private_subnet)
 
-        SGVPCe2 = ec2.SecurityGroup(self, "security-group-VPCe-2",
+        # add private endpoints for session manager
+        mySG2 = ec2.SecurityGroup(self, "security-group-VPCes2",
             vpc=vpc2,
             allow_all_outbound=True,
             description='CDK VPC Endp Security Group'
         )
 
-        SGVPCe2.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), 'HTTPS frm anywhere')
+        mySG2.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.tcp(443), 'HTTPS frm anywhere')
 
         # add private endpoints for session manager
-        ec2.CfnVPCEndpoint(self, 'ssm-vpce-2', 
+        ec2.CfnVPCEndpoint(self, 'ssm-vpce2', 
             service_name="com.amazonaws."+Aws.REGION+".ssm",
             vpc_id=vpc2.vpc_id,
             subnet_ids=[private_subnet2.attr_subnet_id],
-            security_group_ids=[SGVPCe2.security_group_id],
+            security_group_ids=[mySG2.security_group_id],
             vpc_endpoint_type='Interface',
             private_dns_enabled=True
         ).add_dependency(private_subnet2)
 
-        ec2.CfnVPCEndpoint(self, 'ssmmessages-vpce-2', 
+        ec2.CfnVPCEndpoint(self, 'ssmmessages-vpce2', 
             service_name="com.amazonaws."+Aws.REGION+".ssmmessages",
             vpc_id=vpc2.vpc_id,
             subnet_ids=[private_subnet2.attr_subnet_id],
-            security_group_ids=[SGVPCe2.security_group_id],
+            security_group_ids=[mySG2.security_group_id],
             vpc_endpoint_type='Interface',
             private_dns_enabled=True
         ).add_dependency(private_subnet2)
 
-        ec2.CfnVPCEndpoint(self, 'ec2-vpce-2', 
+        ec2.CfnVPCEndpoint(self, 'ec2-vpce2', 
             service_name="com.amazonaws."+Aws.REGION+".ec2",
             vpc_id=vpc2.vpc_id,
             subnet_ids=[private_subnet2.attr_subnet_id],
-            security_group_ids=[SGVPCe2.security_group_id],
+            security_group_ids=[mySG2.security_group_id],
             vpc_endpoint_type='Interface',
             private_dns_enabled=True
         ).add_dependency(private_subnet2)
 
-        SGVEC21 = ec2.SecurityGroup(self, "security-group-EC2-1",
+        # Create an EC2 instance
+
+        myEC2SG = ec2.SecurityGroup(self, "security-group-VPCes-EC2",
             vpc=vpc,
             allow_all_outbound=True,
-            description='CDK EC2 Security Group'
+            description='CDK VPC Endp Security Group'
         )
 
-        SGVEC21.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.icmp_ping(), 'Ping from anywhere')
+        myEC2SG.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.icmp_ping(), 'icmp frm anywhere')
 
-        # Create an EC2 instance
         instance = ec2.Instance(self, "EC2Instance VPC1",
             instance_type=ec2.InstanceType("t3.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux2(),
+            security_group=myEC2SG,
             vpc=vpc,
-            security_group=SGVEC21,
             vpc_subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.10.0.0/16"])])
         )
 
-        SGVEC22 = ec2.SecurityGroup(self, "security-group-EC2-2",
+        # Create an EC2 instance
+        myEC2SG2 = ec2.SecurityGroup(self, "security-group-VPCes-EC2-2",
             vpc=vpc2,
             allow_all_outbound=True,
-            description='CDK EC2 Security Group'
+            description='CDK VPC Endp Security Group'
         )
 
-        SGVEC22.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.icmp_ping(), 'Ping from anywhere')
+        myEC2SG2.add_ingress_rule(ec2.Peer.any_ipv4(), ec2.Port.icmp_ping(), 'icmp frm anywhere')
 
-        # Create an EC2 instance
         instance2 = ec2.Instance(self, "EC2Instance VPC2",
             instance_type=ec2.InstanceType("t3.micro"),
             machine_image=ec2.MachineImage.latest_amazon_linux2(),
+            security_group=myEC2SG2,
             vpc=vpc2,
-            security_group=SGVEC22,
             vpc_subnets=ec2.SubnetSelection(subnet_filters=[ec2.SubnetFilter.by_cidr_ranges(["10.20.0.0/16"])])
         )
 
